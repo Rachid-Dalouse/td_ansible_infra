@@ -1,0 +1,20 @@
+- name: Acte 1 - essai csr1000
+  # On va agir sur l'hôte csr1000 dans cet acte
+  hosts: csr1000
+  # Passe l'étape permettant de récupérer des informations sur l'hôte
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+    - name: Récupère la configuration
+      cisco.ios.ios_command:
+        commands: show running-config
+      register: config
+
+    - name: Enregistre la configuration localement
+      delegate_to: localhost
+      run_once: true
+      copy:
+        content: "{{ config.stdout[0] }}"
+        dest: "show_run_{{ inventory_hostname }}.txt"
+
