@@ -25,9 +25,8 @@
         lines:
           - access-list 1 permit 192.168.2.0 0.0.255.255
 
-    - name: Activer le NAT dynamique (PAT overload) sans timeout
-      cisco.ios.ios_command:
-        commands:
-          - configure terminal
+    - name: Activer le NAT dynamique (PAT overload) 
+      cisco.ios.ios_config:
+        lines:
           - ip nat inside source list 1 interface GigabitEthernet1 overload
-          - end
+          

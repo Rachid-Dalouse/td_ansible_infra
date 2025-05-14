@@ -1,9 +1,13 @@
-- name: Configuration des interfaces et DHCP (1.1 à 1.2)
+- name: Configuration des interfaces (1.1) et DHCP (1.2)
   hosts: csr1000
   gather_facts: no
+  connection: network_cli
 
   tasks:
-    # Interfaces
+
+    # -------------------------
+    # 1.1 - Interface WAN (DHCP)
+    # -------------------------
     - name: Configurer GigabitEthernet1 (WAN DHCP)
       cisco.ios.ios_config:
         lines:
@@ -12,37 +16,36 @@
           - description WAN DHCP
         parents: interface GigabitEthernet1
 
-    - name: Configurer GigabitEthernet2 (LAN 1)
-      cisco.ios.ios_config:
-        lines:
-          - ip address 192.168.2.1 255.255.255.0
-          - no shutdown
-          - description LAN 1
-        parents: interface GigabitEthernet2
+    # -------------------------
+    # 1.1 - Interfaces LAN (statique)
+    # -------------------------
+    - name: Configurer GigabitEthernet2, 3 et 4 avec IP statique (sans desc ni enabled)
+      cisco.ios.ios_l3_interfaces:
+        config:
+          - name: GigabitEthernet2
+            ipv4:
+              - address: 192.168.2.1/24
+             
 
-    - name: Configurer GigabitEthernet3 (DMZ)
-      cisco.ios.ios_config:
-        lines:
-          - ip address 192.168.3.1 255.255.255.0
-          - no shutdown
-          - description DMZ
-        parents: interface GigabitEthernet3
+          - name: GigabitEthernet3
+            ipv4:
+              - address: 192.168.3.1/24
+             
+          - name: GigabitEthernet4
+            ipv4:
+              - address: 192.168.4.1/24
+             
+        state: merged
 
-    - name: Configurer GigabitEthernet4 (ADMIN)
-      cisco.ios.ios_config:
-        lines:
-          - ip address 192.168.4.1 255.255.255.0
-          - no shutdown
-          - description ADMIN
-        parents: interface GigabitEthernet4
-
-    # DHCP
-    - name: Supprimer le pool DHCP existant
+    # -------------------------
+    # 1.2 - DHCP Server
+    # -------------------------
+    - name: Supprimer le pool DHCP existant (si présent)
       cisco.ios.ios_config:
         lines:
           - no ip dhcp pool LAN_POOL
 
-    - name: Créer un pool DHCP pour le LAN
+    - name: Créer un pool DHCP pour le LAN (GigabitEthernet2)
       cisco.ios.ios_config:
         lines:
           - ip dhcp pool LAN_POOL

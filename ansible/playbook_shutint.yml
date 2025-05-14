@@ -1,0 +1,18 @@
+- name: Activation des interfaces LAN via ios_l3_interfaces
+  hosts: csr1000
+  gather_facts: no
+  connection: network_cli
+
+  tasks:
+    - name: Activer G2, G3 et G4 
+      cisco.ios.ios_interfaces:
+        config:
+          - name: GigabitEthernet2
+            enabled: true
+
+          - name: GigabitEthernet3
+            enabled: true
+
+          - name: GigabitEthernet4
+            enabled: true
+        state: merged
