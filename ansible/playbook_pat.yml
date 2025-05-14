@@ -1,0 +1,14 @@
+- name: Configuration du PAT par port (1.4 - HTTP et SSH)
+  hosts: csr1000
+  gather_facts: no
+
+  tasks:
+    - name: Rediriger le port 80 (HTTP) vers 192.168.3.100:80
+      cisco.ios.ios_config:
+        lines:
+          - ip nat inside source static tcp 192.168.3.100 80 interface GigabitEthernet1 80
+
+    - name: Rediriger le port 2222 (externe) vers 192.168.4.100:22 (SSH)
+      cisco.ios.ios_config:
+        lines:
+          - ip nat inside source static tcp 192.168.4.100 22 interface GigabitEthernet1 2222
