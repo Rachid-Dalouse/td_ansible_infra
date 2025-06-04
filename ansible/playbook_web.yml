@@ -1,0 +1,30 @@
+- name: Installation du serveur Web Apache
+  hosts: web
+  gather_facts: yes
+  become: yes
+
+  tasks:
+    - name: Mise à jour du cache APT
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Installation du paquet apache2
+      apt:
+        name: apache2
+        state: present
+
+    - name: Copier le contenu du site web dans /var/www/html
+      copy:
+        src: files/site_web/
+        dest: /var/www/html/
+        owner: www-data
+        group: www-data
+        mode: '0600'
+        
+
+    - name: Activer et redémarrer le service apache2
+      service:
+        name: apache2
+        state: restarted
+        enabled: yes
